@@ -6,7 +6,3 @@ type Stock struct{
 	Price int64 `json:"price"`
 	Company string  `json:"company"`
 }
-
-func model(){
-
-}
