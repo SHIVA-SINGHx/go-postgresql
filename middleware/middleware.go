@@ -8,8 +8,9 @@ import (
 	"log"
 	"net/http"
 	"os"
-
+	"strconv"
 	"github.com/joho/godotenv"
+	"github.com/gorilla/mux"
 )
 
 type response struct {
@@ -56,8 +57,26 @@ func CreateStock(w http.ResponseWriter, r *http.Request){
 	}
 
 	json.NewEncoder(w).Encode(res)
-
 }
+
+
+func GetStock(w http.ResponseWriter, r *http.Request){
+	params:= mux.Vars(r)
+
+	id, err := strconv.Atoi(params["id"])
+	if err != nil  {
+		log.Fatal("Unable to convert the string into int. %v", err)
+	}
+
+	stock, err:= getStock(int64(id))
+
+	if err != nil{
+		log.Fatal("Unable to get stock. %v", err)
+	}
+
+	json.NewEncoder(w).Encode(stock)
+}
+
 
 
 
