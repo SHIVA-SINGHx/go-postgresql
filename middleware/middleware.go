@@ -86,6 +86,34 @@ func GetAllStock(w http.ResponseWriter, r *http.Request){
 	json.NewEncoder(w).Encode(stocks)
 }
 
+func UpdateStock(w http.ResponseWriter, r *http.Response){
+	params:= mux.Vars(r)
+
+	id, err:= strconv.Atoi(params["id"])
+
+	if err != nil {
+		log.Fatal("Unable to convert the string into int %v", err)
+	}
+
+	var stock model.Stock
+
+	err = json.NewDecoder(r.Body).Decode(&stock)
+
+
+	if err != nil{
+		log.Fatalf("Unable to deocde the request body %v", err)
+	}
+
+	updateRows := updateStock(int64(id), stock)
+
+	msg:= fmt.Sprintf("Stock updated successsfully. Total rows/records affected %v", updateRows)
+	res:= response{
+		ID: int64(id),
+		Message: msg,
+	}
+
+	json.NewDecoder(w).Decode(res)
+}
 
 
 
