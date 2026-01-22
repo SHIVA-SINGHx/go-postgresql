@@ -32,5 +32,8 @@ func CreateConnectionDb() *sql.DB {
 		panic(err)
 	}
 
-	fmt.Println("Successfully db connect")
+	fmt.Println("Successfully Connected to db - postgres")
+	return  db
+
 }
+
