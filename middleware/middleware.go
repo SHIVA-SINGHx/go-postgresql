@@ -77,6 +77,17 @@ func GetStock(w http.ResponseWriter, r *http.Request){
 	json.NewEncoder(w).Encode(stock)
 }
 
+func GetAllStock(w http.ResponseWriter, r *http.Request){
+	stocks, err:= egtAllStocks()
+	if err != nil{
+		log.Fatal("Unable to get all the stocks %v", err)
+	}
+
+	json.NewEncoder(w).Encode(stocks)
+}
+
+
+
 
 
 
