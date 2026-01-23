@@ -3,14 +3,17 @@ package middleware
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	model "go-postgrsql/models"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
-	"github.com/joho/godotenv"
+
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
+	"golang.org/x/tools/go/analysis/passes/defers"
 )
 
 type response struct {
@@ -18,7 +21,7 @@ type response struct {
 	Message string `json:"message. omitempyt"`
 }
 
-func CreateConnectionDb() *sql.DB {
+func createConnectionDb() *sql.DB {
 	err:= godotenv.Load(".env")
 
 	if err != nil{
@@ -134,6 +137,26 @@ func DeleteStock(w http.ResponseWriter, r http.Response){
 	json.NewEncoder(w).Encode(res)
 
 }
+
+
+func insertStock(stock model.Stock) int64{
+	db:= createConnectionDb()
+	defer db.Close()
+
+	sqlStatement:= `INSERT INTO stocks(name, price, company) VALUES ($1, $2, $3) RETURNING stockid`
+
+	var id int64
+	err:= db.QueryRow(sqlStatement, stock.Name, stock.Price, stock.Company).Scan(&id)
+
+	if err != nil{
+		log.Fatalf("Unable to execute the query %v", err)
+	}
+
+	fmt.Printf("Inserted a single query %v", id)
+	return  id
+
+}
+
 
 
 
