@@ -142,7 +142,7 @@ func insertStock(stock model.Stock) int64{
 	db:= createConnectionDb()
 	defer db.Close()
 
-	sqlStatement:= `INSERT INTO stocks(name, price, company) VALUES ($1, $2, $3) RETURNING stockid`
+	sqlStatement:= `INSERT INTO stocks(name, price, company) VALUES ($2, $3, $4) RETURNING stockid`
 
 	var id int64
 	err:= db.QueryRow(sqlStatement, stock.Name, stock.Price, stock.Company).Scan(&id)
@@ -206,9 +206,28 @@ func getAllStocks()([] model.Stock, error){
 	}
 
 	return  stocks, err
-
-
 }
+
+func updateStock(id int64 , stock model.Stock)int64 {
+	db:= createConnectionDb()
+
+	sqlStatement:= `UPDATE stocks SET name= $2, price= $3, company= $4 WHERE stockid= $1`
+
+	res, err:= db.Exec(sqlStatement, id, stock.Name, stock.Price, stock.Company)
+
+	if err != nil{
+		log.Fatalf("Unable to execute the query %v", err)
+	}
+
+	rowAffected, err := res.RowsAffected()
+
+	if err != nil{
+		log.Fatalf("Error while checking the affected rows %v", err)
+	}
+	fmt.Println("Total rows/records affected %v", rowAffected)
+	return  rowAffected
+}
+
 
 
 
