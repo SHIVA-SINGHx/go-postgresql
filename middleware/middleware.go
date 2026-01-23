@@ -160,24 +160,52 @@ func getStock (id int64) (model.Stock, error){
 	db:= createConnectionDb()
 	defer db.Close()
 
-	var stock model.Stock
+	var stocks model.Stock
 	sqlStatement:= `SELECT * FROM stocks WHERE stockid= $1`
 
 	row:= db.QueryRow(sqlStatement, id)
-	err := row.Scan(&stock.StockID, &stock.Name, &stock.Company, &stock.Price)
+	err := row.Scan(&stocks.StockID, &stocks.Name, &stocks.Company, &stocks.Price)
 
 	switch err {
 	case sql.ErrNoRows:
 		fmt.Println("Now rows were returned ")
-		return  stock, nil
+		return  stocks, nil
 	case nil :
-		return stock, nil
+		return stocks, nil
 	default:
 		log.Fatalf("Unable to scan rows %v", err)
 
 	}
 
 	return stock, err
+
+}
+
+func getAllStocks()([] model.Stock, error){
+	db:= createConnectionDb()
+	defer db.Close()
+	
+	var stocks [] model.Stock
+	sqlStatement:= `SELECT * FROM stocks`
+	rows, err:= db.Query(sqlStatement)
+
+	if err != nil{
+		log.Fatalf("Unable to execute the query %v", err)
+	}
+	defer rows.Close()
+
+	for rows.Next(){
+		var stock model.Stock
+		err:= rows.Scan(&stock.StockID, &stock.Name, &stock.Price, &stock.Company)
+
+		if err != nil{
+			log.Fatalf("Unable to scan the query %v", err)
+		}
+		stocks = append(stocks, stock)
+
+	}
+
+	return  stocks, err
 
 
 }
