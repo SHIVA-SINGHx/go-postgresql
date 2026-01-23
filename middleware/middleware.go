@@ -177,7 +177,7 @@ func getStock (id int64) (model.Stock, error){
 
 	}
 
-	return stock, err
+	return stocks, err
 
 }
 
@@ -226,6 +226,25 @@ func updateStock(id int64 , stock model.Stock)int64 {
 	}
 	fmt.Println("Total rows/records affected %v", rowAffected)
 	return  rowAffected
+}
+
+func deleteStock(id int64 ,stock model.Stock)int64{
+	db:= createConnectionDb()
+	defer db.Close()
+
+	sqlStatement:= `DELETE FROM stocks WHERE stockid= $1`
+	res, err:= db.Exec(sqlStatement, id)
+	if err != nil{
+		log.Fatalf("Unable to fethc the query %v", err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil{
+		log.Fatalf("Error while checking the affected rows %v", err)
+	}
+
+	fmt.Println("Total rows/records affected %v", rowsAffected)
+	return  rowsAffected
 }
 
 
