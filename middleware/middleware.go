@@ -3,7 +3,6 @@ package middleware
 import (
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"fmt"
 	model "go-postgrsql/models"
 	"log"
@@ -81,7 +80,7 @@ func GetStock(w http.ResponseWriter, r *http.Request){
 }
 
 func GetAllStock(w http.ResponseWriter, r *http.Request){
-	stocks, err:= egtAllStocks()
+	stocks, err:= getAllStocks()
 	if err != nil{
 		log.Fatal("Unable to get all the stocks %v", err)
 	}
@@ -157,6 +156,31 @@ func insertStock(stock model.Stock) int64{
 
 }
 
+func getStock (id int64) (model.Stock, error){
+	db:= createConnectionDb()
+	defer db.Close()
+
+	var stock model.Stock
+	sqlStatement:= `SELECT * FROM stocks WHERE stockid= $1`
+
+	row:= db.QueryRow(sqlStatement, id)
+	err := row.Scan(&stock.StockID, &stock.Name, &stock.Company, &stock.Price)
+
+	switch err {
+	case sql.ErrNoRows:
+		fmt.Println("Now rows were returned ")
+		return  stock, nil
+	case nil :
+		return stock, nil
+	default:
+		log.Fatalf("Unable to scan rows %v", err)
+
+	}
+
+	return stock, err
+
+
+}
 
 
 
